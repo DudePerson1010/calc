@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #121212;
+            color: white;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .main-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            background-color: #333;
+            color: white;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: #f9a826;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin: 15px;
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 80%;
+            margin: auto;
+        }
+
+        .calculator button {
+            font-size: 18px;
+            padding: 15px;
+            background-color: #444;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .calculator button:hover {
+            background-color: #555;
+        }
+
+        .output {
+            grid-column: span 4;
+            font-size: 24px;
+            padding: 10px;
+            text-align: right;
+            background-color: #222;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #1e7e34;
+        }
+
+        .greeting {
+            font-family: 'Pacifico', cursive;
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #f9a826;
+        }
+
+        .conversion-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;  /* Smaller gap between conversion buttons */
+            margin-top: 20px;
+        }
+
+        .conversion-buttons button {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #444;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .conversion-buttons button:hover {
+            background-color: #555;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Main Screen -->
+    <div class="main-screen">
+        <div class="greeting" id="greeting"></div>
+        <div class="buttons">
+            <button onclick="showScreen('basic')">Basic Calculator</button>
+            <button onclick="showScreen('video')">Video Speed/Time Calculator</button>
+            <button onclick="showScreen('conversion')">Conversion Calculator</button>
+        </div>
+    </div>
+
+    <!-- Basic Calculator Screen -->
+    <div id="basic" class="screen">
+        <h1>Basic Calculator</h1>
+        <div class="calculator">
+            <input type="text" class="output" id="basicOutput" readonly>
+            <button onclick="appendNumber('basicOutput', '7')">7</button>
+            <button onclick="appendNumber('basicOutput', '8')">8</button>
+            <button onclick="appendNumber('basicOutput', '9')">9</button>
+            <button onclick="operate('basicOutput', '/')">÷</button>
+            <button onclick="appendNumber('basicOutput', '4')">4</button>
+            <button onclick="appendNumber('basicOutput', '5')">5</button>
+            <button onclick="appendNumber('basicOutput', '6')">6</button>
+            <button onclick="operate('basicOutput', '*')">×</button>
+            <button onclick="appendNumber('basicOutput', '1')">1</button>
+            <button onclick="appendNumber('basicOutput', '2')">2</button>
+            <button onclick="appendNumber('basicOutput', '3')">3</button>
+            <button onclick="operate('basicOutput', '-')">−</button>
+            <button onclick="appendNumber('basicOutput', '0')">0</button>
+            <button onclick="appendNumber('basicOutput', '.')">.</button>
+            <button onclick="calculate('basicOutput')">=</button>
+            <button onclick="operate('basicOutput', '+')">+</button>
+            <button onclick="clearOutput('basicOutput')" style="grid-column: span 4;">Clear</button>
+        </div>
+        <button class="back-button" onclick="goBack()">Back</button>
+    </div>
+
+    <!-- Video Speed/Time Calculator Screen -->
+    <div id="video" class="screen">
+        <h1>Video Speed/Time Calculator</h1>
+        <label for="startTime">Enter Start Time (minutes):</label>
+        <input type="number" id="startTime" placeholder="Start Time">
+        <label for="endTime">Enter End Time (minutes):</label>
+        <input type="number" id="endTime" placeholder="End Time">
+        <label for="speed">Enter Video Speed (e.g., 1.5x):</label>
+        <input type="number" id="speed" step="0.1" placeholder="Speed">
+        <button onclick="calculateVideoTime()">Calculate</button>
+        <p id="videoResult"></p>
+        <button class="back-button" onclick="goBack()">Back</button>
+    </div>
+
+    <!-- Conversion Calculator Screen -->
+    <div id="conversion" class="screen">
+        <h1>Conversion Calculator</h1>
+        <div class="conversion-buttons">
+            <button onclick="convert('meters', 'kilometers')">Meters to Kilometers</button>
+            <button onclick="convert('kilometers', 'meters')">Kilometers to Meters</button>
+            <button onclick="convert('grams', 'kilograms')">Grams to Kilograms</button>
+            <button onclick="convert('kilograms', 'grams')">Kilograms to Grams</button>
+            <button onclick="convert('seconds', 'minutes')">Seconds to Minutes</button>
+            <button onclick="convert('minutes', 'seconds')">Minutes to Seconds</button>
+            <button onclick="convert('celsius', 'fahrenheit')">Celsius to Fahrenheit</button>
+            <button onclick="convert('fahrenheit', 'celsius')">Fahrenheit to Celsius</button>
+            <button onclick="convert('inches', 'centimeters')">Inches to Centimeters</button>
+            <button onclick="convert('centimeters', 'inches')">Centimeters to Inches</button>
+            <button onclick="convert('miles', 'kilometers')">Miles to Kilometers</button>
+            <button onclick="convert('kilometers', 'miles')">Kilometers to Miles</button>
+            <!-- Additional Conversions -->
+            <button onclick="convert('liters', 'gallons')">Liters to Gallons</button>
+            <button onclick="convert('gallons', 'liters')">Gallons to Liters</button>
+            <button onclick="convert('pounds', 'kilograms')">Pounds to Kilograms</button>
+            <button onclick="convert('kilograms', 'pounds')">Kilograms to Pounds</button>
+            <button onclick="convert('yards', 'meters')">Yards to Meters</button>
+            <button onclick="convert('meters', 'yards')">Meters to Yards</button>
+            <button onclick="convert('feet', 'meters')">Feet to Meters</button>
+            <button onclick="convert('meters', 'feet')">Meters to Feet</button>
+            <button onclick="convert('acres', 'square meters')">Acres to Square Meters</button>
+            <button onclick="convert('square meters', 'acres')">Square Meters to Acres</button>
+            <button onclick="convert('pints', 'liters')">Pints to Liters</button>
+            <button onclick="convert('liters', 'pints')">Liters to Pints</button>
+        </div>
+        <label for="fromValue">Enter Value to Convert:</label>
+        <input type="number" id="fromValue" placeholder="Value">
+        <p id="conversionResult"></p>
+        <button class="back-button" onclick="goBack()">Back</button>
+    </div>
+
+    <script>
+        // Function to determine the current time and update the greeting
+        function updateGreeting() {
+            const now = new Date();
+            const hours = now.getHours();
+            let greeting = "Good Evening";
+
+            if (hours >= 5 && hours < 12) {
+                greeting = "Good Morning";
+            } else if (hours >= 12 && hours < 18) {
+                greeting = "Good Afternoon";
+            }
+
+            document.getElementById('greeting').innerText = `${greeting}, Alex!`;
+        }
+
+        // Call the function to set the greeting when the page loads
+        updateGreeting();
+
+        // Existing functions for calculator and navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            document.querySelector('.main-screen').style.display = 'none';
+        }
+
+        function goBack() {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.querySelector('.main-screen').style.display = 'flex';
+        }
+
+        function appendNumber(outputId, number) {
+            const output = document.getElementById(outputId);
+            output.value = output.value + number;
+        }
+
+        function operate(outputId, operator) {
+            const output = document.getElementById(outputId);
+            output.value = output.value + ' ' + operator + ' ';
+        }
+
+        function calculate(outputId) {
+            const output = document.getElementById(outputId);
+            try {
+                output.value = eval(output.value);
+            } catch (e) {
+                output.value = 'Error';
+            }
+        }
+
+        function clearOutput(outputId) {
+            document.getElementById(outputId).value = '';
+        }
+
+        function calculateVideoTime() {
+            const start = parseFloat(document.getElementById('startTime').value);
+            const end = parseFloat(document.getElementById('endTime').value);
+            const speed = parseFloat(document.getElementById('speed').value);
+            const result = ((end - start) / speed).toFixed(2);
+            document.getElementById('videoResult').textContent = `Adjusted time: ${result} minutes`;
+        }
+
+        function convert(fromUnit, toUnit) {
+            const value = parseFloat(document.getElementById('fromValue').value);
+            let result;
+
+            if (fromUnit === 'meters' && toUnit === 'kilometers') {
+                result = value / 1000;
+            } else if (fromUnit === 'kilometers' && toUnit === 'meters') {
+                result = value * 1000;
+            } else if (fromUnit === 'grams' && toUnit === 'kilograms') {
+                result = value / 1000;
+            } else if (fromUnit === 'kilograms' && toUnit === 'grams') {
+                result = value * 1000;
+            } else if (fromUnit === 'seconds' && toUnit === 'minutes') {
+                result = value / 60;
+            } else if (fromUnit === 'minutes' && toUnit === 'seconds') {
+                result = value * 60;
+            } else if (fromUnit === 'celsius' && toUnit === 'fahrenheit') {
+                result = (value * 9/5) + 32;
+            } else if (fromUnit === 'fahrenheit' && toUnit === 'celsius') {
+                result = (value - 32) * 5/9;
+            } else if (fromUnit === 'inches' && toUnit === 'centimeters') {
+                result = value * 2.54;
+            } else if (fromUnit === 'centimeters' && toUnit === 'inches') {
+                result = value / 2.54;
+            } else if (fromUnit === 'miles' && toUnit === 'kilometers') {
+                result = value * 1.60934;
+            } else if (fromUnit === 'kilometers' && toUnit === 'miles') {
+                result = value / 1.60934;
+            } else {
+                result = 'Invalid Conversion';
+            }
+
+            document.getElementById('conversionResult').textContent = `${value} ${fromUnit} = ${result} ${toUnit}`;
+        }
+    </script>
+
+</body>
+</html>
